@@ -18,6 +18,16 @@ export type ChartSeries = {
   points: ChartPoint[];
 };
 
+export type UserSummary = {
+  user: string;
+  color: string;
+  eventCount: number;
+  averageFps: number;
+  minFps: number;
+  maxFps: number;
+  latestEvent: FeedEvent;
+};
+
 export type TooltipParam = {
   color?: string;
   seriesName?: string;
@@ -27,7 +37,7 @@ export type TooltipParam = {
 const colors = ["#6ee7b7", "#f5c867", "#f08a70", "#60a5fa", "#c084fc"];
 const fallbackColor = "#6ee7b7";
 
-export function buildFpsSeries(events: FeedEvent[]) {
+function groupEventsByUser(events: FeedEvent[]) {
   const users = new Map<string, FeedEvent[]>();
 
   for (const event of events) {
@@ -35,6 +45,12 @@ export function buildFpsSeries(events: FeedEvent[]) {
     userEvents.push(event);
     users.set(event.user, userEvents);
   }
+
+  return users;
+}
+
+export function buildFpsSeries(events: FeedEvent[]) {
+  const users = groupEventsByUser(events);
 
   return Array.from(users.entries()).map(([user, userEvents], index) => ({
     user,
@@ -57,6 +73,34 @@ export function getAverageFps(events: FeedEvent[]) {
   const total = events.reduce((sum, event) => sum + event.fps, 0);
 
   return Math.round((total / events.length) * 10) / 10;
+}
+
+export function buildUserSummaries(events: FeedEvent[]) {
+  const users = groupEventsByUser(events);
+
+  return Array.from(users.entries()).map(([user, userEvents], index) => {
+    const fpsValues = userEvents.map((event) => event.fps);
+    const latestEvent = userEvents.reduce((latest, event) =>
+      event.timestamp > latest.timestamp ? event : latest,
+    );
+
+    return {
+      user,
+      color: colors[index % colors.length],
+      eventCount: userEvents.length,
+      averageFps: getAverageFps(userEvents),
+      minFps: Math.min(...fpsValues),
+      maxFps: Math.max(...fpsValues),
+      latestEvent,
+    };
+  });
+}
+
+export function getRecentEvents(events: FeedEvent[], limit = 5) {
+  return events
+    .slice()
+    .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)
+    .slice(0, limit);
 }
 
 export function getTimestampRange(events: FeedEvent[]) {

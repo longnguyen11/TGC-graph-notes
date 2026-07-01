@@ -6,9 +6,11 @@ import type { EChartsOption } from "echarts";
 
 import {
   buildFpsSeries,
+  buildUserSummaries,
   formatGraphTooltip,
   formatTimestamp,
   getAverageFps,
+  getRecentEvents,
   getTimestampRange,
   type ChartSeries,
   type FeedEvent,
@@ -119,6 +121,8 @@ export default function Graph() {
   const [selectedUsers, setSelectedUsers] = useState<Record<string, boolean>>({});
 
   const series = useMemo(() => buildFpsSeries(testData), []);
+  const userSummaries = useMemo(() => buildUserSummaries(testData), []);
+  const recentEvents = useMemo(() => getRecentEvents(testData), []);
   const averageFps = useMemo(() => getAverageFps(testData), []);
   const { firstTimestamp, lastTimestamp } = getTimestampRange(testData);
 
@@ -335,6 +339,72 @@ export default function Graph() {
               </button>
             );
           })}
+        </div>
+      </section>
+
+      <section className="graph-insights" aria-label="Graph details">
+        <div className="panel">
+          <div className="panel-title">
+            <h2>User breakdown</h2>
+            <span>FPS range</span>
+          </div>
+
+          <div className="summary-list">
+            {userSummaries.map((summary) => (
+              <article className="summary-row" key={summary.user}>
+                <div className="summary-user">
+                  <span
+                    className="summary-dot"
+                    style={{ backgroundColor: summary.color }}
+                  />
+                  <div>
+                    <strong>{summary.user}</strong>
+                    <span>{summary.eventCount} events</span>
+                  </div>
+                </div>
+
+                <div className="summary-stats">
+                  <span className="summary-stat">
+                    <strong>{summary.averageFps}</strong>
+                    avg
+                  </span>
+                  <span className="summary-stat">
+                    <strong>{summary.minFps}</strong>
+                    min
+                  </span>
+                  <span className="summary-stat">
+                    <strong>{summary.maxFps}</strong>
+                    max
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-title">
+            <h2>Recent events</h2>
+            <span>{recentEvents.length} latest</span>
+          </div>
+
+          <div className="event-list">
+            {recentEvents.map((event) => (
+              <article className="event-row" key={event.id}>
+                <header>
+                  <div>
+                    <strong>{event.event}</strong>
+                    <span>
+                      {event.user} - {formatTimestamp(event.timestamp)}
+                    </span>
+                  </div>
+                  <span className="event-fps">{event.fps} fps</span>
+                </header>
+
+                <p>{event.description || "No description"}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </main>

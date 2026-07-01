@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildFpsSeries,
+  buildUserSummaries,
   escapeHtml,
   formatGraphTooltip,
   getAverageFps,
+  getRecentEvents,
   getTimestampRange,
 } from "./graph";
 import type { FeedEvent } from "./graph";
@@ -60,6 +62,61 @@ describe("getAverageFps", () => {
 
   it("returns zero for an empty event set", () => {
     expect(getAverageFps([])).toBe(0);
+  });
+});
+
+describe("buildUserSummaries", () => {
+  it("returns per-user fps ranges, averages, counts, and latest events", () => {
+    const summaries = buildUserSummaries(events);
+
+    expect(summaries).toEqual([
+      {
+        user: "david",
+        color: "#6ee7b7",
+        eventCount: 2,
+        averageFps: 28,
+        minFps: 25,
+        maxFps: 31,
+        latestEvent: events[0],
+      },
+      {
+        user: "James",
+        color: "#f5c867",
+        eventCount: 1,
+        averageFps: 60,
+        minFps: 60,
+        maxFps: 60,
+        latestEvent: events[1],
+      },
+    ]);
+  });
+
+  it("returns an empty summary for an empty event set", () => {
+    expect(buildUserSummaries([])).toEqual([]);
+  });
+});
+
+describe("getRecentEvents", () => {
+  it("returns the newest events first up to the requested limit", () => {
+    expect(getRecentEvents(events, 2).map((event) => event.id)).toEqual([1, 2]);
+  });
+
+  it("uses id as a stable tie-breaker for matching timestamps", () => {
+    const tiedEvents = [
+      ...events,
+      {
+        id: 4,
+        user: "James",
+        fps: 59,
+        timestamp: 30,
+        event: "ping",
+        description: "",
+      },
+    ];
+
+    expect(getRecentEvents(tiedEvents, 2).map((event) => event.id)).toEqual([
+      4, 1,
+    ]);
   });
 });
 
