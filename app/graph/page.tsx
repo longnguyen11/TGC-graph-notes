@@ -6,9 +6,10 @@ import type { EChartsOption } from "echarts";
 
 import {
   buildFpsSeries,
+  formatGraphTooltip,
+  formatTimestamp,
   getAverageFps,
   getTimestampRange,
-  type ChartPoint,
   type ChartSeries,
   type FeedEvent,
 } from "@/lib/graph";
@@ -114,76 +115,6 @@ const testData: FeedEvent[] = [
   },
 ];
 
-type TooltipParam = {
-  color?: string;
-  seriesName?: string;
-  data?: ChartPoint;
-};
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function formatTimestamp(timestamp: number) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(new Date(timestamp * 1000));
-}
-
-function formatTooltip(params: unknown) {
-  const items = (Array.isArray(params) ? params : [params]) as TooltipParam[];
-  const events = items
-    .filter((item) => item.data?.event)
-    .sort((a, b) => (b.data?.event.fps ?? 0) - (a.data?.event.fps ?? 0));
-
-  if (events.length === 0) {
-    return "";
-  }
-
-  const timestamp = events[0].data?.event.timestamp ?? 0;
-  const title = escapeHtml(formatTimestamp(timestamp));
-
-  return [
-    `<div style="margin-bottom:8px;font-weight:700;color:#edf2ee">${title}</div>`,
-    ...events.map((item) => {
-      const event = item.data?.event;
-
-      if (!event) {
-        return "";
-      }
-
-      const color = item.color ?? "#6ee7b7";
-      const description = event.description || "None";
-
-      return `
-        <div style="min-width:230px;border-top:1px solid rgba(199,210,204,.14);padding-top:8px;margin-top:8px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px">
-            <span style="display:flex;align-items:center;gap:7px;color:${color};font-weight:700">
-              <span style="display:inline-block;width:8px;height:8px;border-radius:999px;background:${color}"></span>
-              ${escapeHtml(event.user)}
-            </span>
-            <span style="color:#edf2ee;font-variant-numeric:tabular-nums">${event.fps} fps</span>
-          </div>
-          <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;color:#c3cbc7;font-size:12px;line-height:1.5">
-            <span style="color:#9ca7a1">id</span><span>${event.id}</span>
-            <span style="color:#9ca7a1">timestamp</span><span>${event.timestamp}</span>
-            <span style="color:#9ca7a1">event</span><span>${escapeHtml(event.event)}</span>
-            <span style="color:#9ca7a1">description</span><span>${escapeHtml(description)}</span>
-          </div>
-        </div>
-      `;
-    }),
-  ].join("");
-}
-
 export default function Graph() {
   const [selectedUsers, setSelectedUsers] = useState<Record<string, boolean>>({});
 
@@ -245,7 +176,7 @@ export default function Graph() {
             width: 1,
           },
         },
-        formatter: formatTooltip,
+        formatter: formatGraphTooltip,
       },
       xAxis: {
         type: "time",

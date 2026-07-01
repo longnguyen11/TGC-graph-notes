@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { buildFpsSeries, getAverageFps, getTimestampRange } from "./graph";
+import {
+  buildFpsSeries,
+  escapeHtml,
+  formatGraphTooltip,
+  getAverageFps,
+  getTimestampRange,
+} from "./graph";
 import type { FeedEvent } from "./graph";
 
 const events: FeedEvent[] = [
@@ -70,5 +76,65 @@ describe("getTimestampRange", () => {
       firstTimestamp: 0,
       lastTimestamp: 0,
     });
+  });
+});
+
+describe("formatGraphTooltip", () => {
+  it("returns an empty tooltip when no chart event data is available", () => {
+    expect(formatGraphTooltip([])).toBe("");
+    expect(formatGraphTooltip({})).toBe("");
+  });
+
+  it("includes every required data-point property", () => {
+    const tooltip = formatGraphTooltip({
+      color: "#6ee7b7",
+      data: {
+        value: [10_000, 31],
+        event: events[2],
+      },
+    });
+
+    expect(tooltip).toContain("david");
+    expect(tooltip).toContain("31 fps");
+    expect(tooltip).toContain("<span>3</span>");
+    expect(tooltip).toContain("<span>10</span>");
+    expect(tooltip).toContain("item_purchase");
+    expect(tooltip).toContain("season_pass");
+  });
+
+  it("orders multiple tooltip rows by fps descending", () => {
+    const series = buildFpsSeries(events);
+    const tooltip = formatGraphTooltip([
+      { color: "#6ee7b7", data: series[0].points[0] },
+      { color: "#f5c867", data: series[1].points[0] },
+    ]);
+
+    expect(tooltip.indexOf("James")).toBeLessThan(tooltip.indexOf("david"));
+  });
+
+  it("escapes html-sensitive event text", () => {
+    const tooltip = formatGraphTooltip({
+      data: {
+        value: [40_000, 55],
+        event: {
+          id: 4,
+          user: "<Alex>",
+          fps: 55,
+          timestamp: 40,
+          event: "ping&wait",
+          description: "<script>alert(1)</script>",
+        },
+      },
+    });
+
+    expect(tooltip).toContain("&lt;Alex&gt;");
+    expect(tooltip).toContain("ping&amp;wait");
+    expect(tooltip).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+  });
+});
+
+describe("escapeHtml", () => {
+  it("escapes ampersands and angle brackets", () => {
+    expect(escapeHtml("A&B < C > D")).toBe("A&amp;B &lt; C &gt; D");
   });
 });

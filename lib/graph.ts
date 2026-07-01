@@ -18,7 +18,14 @@ export type ChartSeries = {
   points: ChartPoint[];
 };
 
+export type TooltipParam = {
+  color?: string;
+  seriesName?: string;
+  data?: ChartPoint;
+};
+
 const colors = ["#6ee7b7", "#f5c867", "#f08a70", "#60a5fa", "#c084fc"];
+const fallbackColor = "#6ee7b7";
 
 export function buildFpsSeries(events: FeedEvent[]) {
   const users = new Map<string, FeedEvent[]>();
@@ -61,4 +68,74 @@ export function getTimestampRange(events: FeedEvent[]) {
     firstTimestamp: Math.min(...events.map((event) => event.timestamp)),
     lastTimestamp: Math.max(...events.map((event) => event.timestamp)),
   };
+}
+
+export function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+export function formatTimestamp(timestamp: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(new Date(timestamp * 1000));
+}
+
+function tooltipField(label: string, value: string | number) {
+  return `<span class="graph-tooltip__label">${label}</span><span>${value}</span>`;
+}
+
+function tooltipEventSection(item: TooltipParam) {
+  const event = item.data?.event;
+
+  if (!event) {
+    return "";
+  }
+
+  const color = item.color ?? fallbackColor;
+  const description = event.description || "None";
+
+  return [
+    `<div class="graph-tooltip__section" style="--tooltip-color:${color}">`,
+    '<div class="graph-tooltip__heading">',
+    '<span class="graph-tooltip__user">',
+    '<span class="graph-tooltip__marker"></span>',
+    escapeHtml(event.user),
+    "</span>",
+    `<span class="graph-tooltip__fps">${event.fps} fps</span>`,
+    "</div>",
+    '<div class="graph-tooltip__grid">',
+    tooltipField("id", event.id),
+    tooltipField("timestamp", event.timestamp),
+    tooltipField("event", escapeHtml(event.event)),
+    tooltipField("description", escapeHtml(description)),
+    "</div>",
+    "</div>",
+  ].join("");
+}
+
+export function formatGraphTooltip(params: unknown) {
+  const items = (Array.isArray(params) ? params : [params]) as TooltipParam[];
+  const events = items
+    .filter((item) => item.data?.event)
+    .sort((a, b) => (b.data?.event.fps ?? 0) - (a.data?.event.fps ?? 0));
+
+  if (events.length === 0) {
+    return "";
+  }
+
+  const timestamp = events[0].data?.event.timestamp ?? 0;
+  const title = escapeHtml(formatTimestamp(timestamp));
+
+  return [
+    `<div class="graph-tooltip__title">${title}</div>`,
+    ...events.map(tooltipEventSection),
+  ].join("");
 }
