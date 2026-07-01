@@ -10,6 +10,7 @@
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "start": "next start",
     "zip": "git archive HEAD -o TakeHomeProject.zip"
