@@ -4,16 +4,16 @@ import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import type { EChartsOption } from "echarts";
 
-const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
+import {
+  buildFpsSeries,
+  getAverageFps,
+  getTimestampRange,
+  type ChartPoint,
+  type ChartSeries,
+  type FeedEvent,
+} from "@/lib/graph";
 
-type FeedEvent = {
-  id: number;
-  user: string;
-  fps: number;
-  timestamp: number;
-  event: string;
-  description: string;
-};
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 const testData: FeedEvent[] = [
   {
@@ -114,19 +114,6 @@ const testData: FeedEvent[] = [
   },
 ];
 
-const colors = ["#6ee7b7", "#f5c867", "#f08a70", "#60a5fa", "#c084fc"];
-
-type ChartPoint = {
-  value: [number, number];
-  event: FeedEvent;
-};
-
-type ChartSeries = {
-  user: string;
-  color: string;
-  points: ChartPoint[];
-};
-
 type TooltipParam = {
   color?: string;
   seriesName?: string;
@@ -197,41 +184,12 @@ function formatTooltip(params: unknown) {
   ].join("");
 }
 
-function buildSeries(events: FeedEvent[]) {
-  const users = new Map<string, FeedEvent[]>();
-
-  for (const event of events) {
-    const userEvents = users.get(event.user) ?? [];
-    userEvents.push(event);
-    users.set(event.user, userEvents);
-  }
-
-  return Array.from(users.entries()).map(([user, userEvents], index) => ({
-    user,
-    color: colors[index % colors.length],
-    points: userEvents
-      .slice()
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .map((event) => ({
-        value: [event.timestamp * 1000, event.fps] as [number, number],
-        event,
-      })),
-  }));
-}
-
-function getAverageFps(events: FeedEvent[]) {
-  const total = events.reduce((sum, event) => sum + event.fps, 0);
-
-  return Math.round((total / events.length) * 10) / 10;
-}
-
 export default function Graph() {
   const [selectedUsers, setSelectedUsers] = useState<Record<string, boolean>>({});
 
-  const series = useMemo(() => buildSeries(testData), []);
+  const series = useMemo(() => buildFpsSeries(testData), []);
   const averageFps = useMemo(() => getAverageFps(testData), []);
-  const firstTimestamp = Math.min(...testData.map((event) => event.timestamp));
-  const lastTimestamp = Math.max(...testData.map((event) => event.timestamp));
+  const { firstTimestamp, lastTimestamp } = getTimestampRange(testData);
 
   const option = useMemo<EChartsOption>(
     () => ({
