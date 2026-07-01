@@ -286,7 +286,8 @@ a {
 }
 
 .primary-button,
-.danger-button {
+.danger-button,
+.ghost-button {
   min-height: 40px;
   border-radius: var(--radius);
   padding: 0 14px;
@@ -305,12 +306,14 @@ a {
 }
 
 .primary-button:hover:not(:disabled),
-.danger-button:hover:not(:disabled) {
+.danger-button:hover:not(:disabled),
+.ghost-button:hover:not(:disabled) {
   transform: translateY(-1px);
 }
 
 .primary-button:disabled,
-.danger-button:disabled {
+.danger-button:disabled,
+.ghost-button:disabled {
   opacity: 0.55;
 }
 
@@ -318,6 +321,12 @@ a {
   border: 1px solid rgba(251, 113, 133, 0.34);
   background: rgba(251, 113, 133, 0.09);
   color: #fecdd3;
+}
+
+.ghost-button {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted-strong);
 }
 
 .form-error,
@@ -377,6 +386,96 @@ a {
   text-align: center;
 }
 
+.chart-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+}
+
+.chart-panel::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, var(--accent), var(--amber), transparent);
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.chart-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.chart-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px;
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 26px;
+}
+
+.chart-canvas {
+  width: 100%;
+  min-height: 460px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted-strong);
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
 @media (max-width: 760px) {
   .site-nav {
     align-items: flex-start;
@@ -390,5 +489,17 @@ a {
 
   .notes-layout {
     grid-template-columns: 1fr;
+  }
+
+  .chart-header {
+    flex-direction: column;
+  }
+
+  .metric-row {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-canvas {
+    min-height: 380px;
   }
 }
