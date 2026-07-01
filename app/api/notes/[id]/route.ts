@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { isMissingRecord, parseNoteId } from "@/lib/notes-api";
 import { getPrisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -9,25 +10,6 @@ type RouteContext = {
     id: string;
   }>;
 };
-
-function parseNoteId(value: string) {
-  const id = Number(value);
-
-  if (!Number.isInteger(id) || id < 1) {
-    return null;
-  }
-
-  return id;
-}
-
-function isMissingRecord(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2025"
-  );
-}
 
 export async function DELETE(_request: Request, context: RouteContext) {
   const { id: rawId } = await context.params;

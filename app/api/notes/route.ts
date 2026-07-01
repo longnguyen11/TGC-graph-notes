@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { ZodError } from "zod";
 
+import { getValidationMessage } from "@/lib/notes-api";
 import { noteSchema } from "@/lib/notes";
 import { getPrisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
-
-function validationMessage(error: ZodError) {
-  return error.issues[0]?.message ?? "Invalid note.";
-}
 
 function serverError(error: unknown) {
   console.error(error);
@@ -44,7 +40,7 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: validationMessage(parsed.error) },
+      { error: getValidationMessage(parsed.error) },
       { status: 400 },
     );
   }
