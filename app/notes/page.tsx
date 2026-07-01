@@ -3,7 +3,12 @@
 import { FormEvent, useMemo, useState } from "react";
 import useSWR from "swr";
 
-import { NoteDto, noteSchema } from "@/lib/notes";
+import {
+  getNoteFieldErrors,
+  NOTE_LIMITS,
+  noteSchema,
+} from "@/lib/notes";
+import type { NoteDto, NoteFieldErrors } from "@/lib/notes";
 
 type NotesResponse = {
   notes: NoteDto[];
@@ -41,6 +46,7 @@ function formatNoteDate(value: string) {
 export default function Notes() {
   const [author, setAuthor] = useState("");
   const [body, setBody] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<NoteFieldErrors>({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -68,10 +74,12 @@ export default function Notes() {
     const parsed = noteSchema.safeParse({ author, body });
 
     if (!parsed.success) {
-      setFormError(parsed.error.issues[0]?.message ?? "Invalid note.");
+      setFieldErrors(getNoteFieldErrors(parsed.error));
+      setFormError("Please fix the highlighted fields.");
       return;
     }
 
+    setFieldErrors({});
     setIsSubmitting(true);
 
     try {
@@ -107,6 +115,7 @@ export default function Notes() {
 
       setAuthor("");
       setBody("");
+      setFieldErrors({});
     } catch (error) {
       setFormError(
         error instanceof Error ? error.message : "Unable to publish note.",
@@ -170,11 +179,25 @@ export default function Notes() {
                 id="author"
                 name="author"
                 autoComplete="name"
-                maxLength={80}
+                maxLength={NOTE_LIMITS.author}
                 value={author}
-                onChange={(event) => setAuthor(event.target.value)}
+                onChange={(event) => {
+                  setAuthor(event.target.value);
+                  setFormError("");
+                  setFieldErrors((current) => ({ ...current, author: undefined }));
+                }}
                 placeholder="e.g. Jen"
+                aria-describedby="author-meta"
+                aria-invalid={Boolean(fieldErrors.author)}
               />
+              <div className="field-meta" id="author-meta">
+                {fieldErrors.author ? (
+                  <span className="field-error">{fieldErrors.author}</span>
+                ) : null}
+                <span className="field-counter">
+                  {author.length}/{NOTE_LIMITS.author}
+                </span>
+              </div>
             </div>
 
             <div className="field">
@@ -182,11 +205,25 @@ export default function Notes() {
               <textarea
                 id="body"
                 name="body"
-                maxLength={1000}
+                maxLength={NOTE_LIMITS.body}
                 value={body}
-                onChange={(event) => setBody(event.target.value)}
+                onChange={(event) => {
+                  setBody(event.target.value);
+                  setFormError("");
+                  setFieldErrors((current) => ({ ...current, body: undefined }));
+                }}
                 placeholder="Write a note..."
+                aria-describedby="body-meta"
+                aria-invalid={Boolean(fieldErrors.body)}
               />
+              <div className="field-meta" id="body-meta">
+                {fieldErrors.body ? (
+                  <span className="field-error">{fieldErrors.body}</span>
+                ) : null}
+                <span className="field-counter">
+                  {body.length}/{NOTE_LIMITS.body}
+                </span>
+              </div>
             </div>
 
             {formError ? <div className="form-error">{formError}</div> : null}

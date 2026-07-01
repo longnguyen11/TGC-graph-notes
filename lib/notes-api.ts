@@ -5,13 +5,11 @@ export function getValidationMessage(error: ZodError) {
 }
 
 export function parseNoteId(value: string) {
-  const id = Number(value);
-
-  if (!Number.isInteger(id) || id < 1) {
+  if (!/^[1-9]\d*$/.test(value)) {
     return null;
   }
 
-  return id;
+  return Number(value);
 }
 
 export function isMissingRecord(error: unknown) {

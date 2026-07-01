@@ -13,6 +13,9 @@ describe("parseNoteId", () => {
     expect(parseNoteId("0")).toBeNull();
     expect(parseNoteId("-1")).toBeNull();
     expect(parseNoteId("1.5")).toBeNull();
+    expect(parseNoteId("1e2")).toBeNull();
+    expect(parseNoteId("0x10")).toBeNull();
+    expect(parseNoteId(" 2 ")).toBeNull();
     expect(parseNoteId("abc")).toBeNull();
   });
 });

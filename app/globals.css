@@ -285,6 +285,35 @@ a {
   box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.14);
 }
 
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: rgba(251, 113, 133, 0.64);
+}
+
+.field-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 18px;
+}
+
+.field-error,
+.field-counter {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.field-error {
+  color: #fecdd3;
+}
+
+.field-counter {
+  margin-left: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .primary-button,
 .danger-button,
 .ghost-button {

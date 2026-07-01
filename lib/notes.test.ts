@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { noteSchema } from "./notes";
+import { getNoteFieldErrors, NOTE_LIMITS, noteSchema } from "./notes";
 
 describe("noteSchema", () => {
   it("trims valid note input", () => {
@@ -33,8 +33,8 @@ describe("noteSchema", () => {
 
   it("enforces field length limits", () => {
     const result = noteSchema.safeParse({
-      author: "a".repeat(81),
-      body: "b".repeat(1_001),
+      author: "a".repeat(NOTE_LIMITS.author + 1),
+      body: "b".repeat(NOTE_LIMITS.body + 1),
     });
 
     expect(result.success).toBe(false);
@@ -44,6 +44,22 @@ describe("noteSchema", () => {
         "Author must be 80 characters or fewer.",
         "Body must be 1,000 characters or fewer.",
       ]);
+    }
+  });
+
+  it("maps validation issues to form fields", () => {
+    const result = noteSchema.safeParse({
+      author: "",
+      body: "",
+    });
+
+    expect(result.success).toBe(false);
+
+    if (!result.success) {
+      expect(getNoteFieldErrors(result.error)).toEqual({
+        author: "Author is required.",
+        body: "Body is required.",
+      });
     }
   });
 });
