@@ -1,0 +1,124 @@
+.note-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  color: var(--muted-strong);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--text);
+  outline: none;
+  padding: 11px 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.field textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: rgba(110, 231, 183, 0.7);
+  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.14);
+}
+
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: rgba(251, 113, 133, 0.64);
+}
+
+.field-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 18px;
+}
+
+.field-error,
+.field-counter {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.field-error {
+  color: #fecdd3;
+}
+
+.field-counter {
+  margin-left: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.primary-button,
+.danger-button,
+.ghost-button {
+  min-height: 40px;
+  border-radius: var(--radius);
+  padding: 0 14px;
+  font-weight: 700;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.primary-button {
+  border: 1px solid rgba(110, 231, 183, 0.4);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #06251a;
+}
+
+.primary-button:hover:not(:disabled),
+.danger-button:hover:not(:disabled),
+.ghost-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled,
+.danger-button:disabled,
+.ghost-button:disabled {
+  opacity: 0.55;
+}
+
+.danger-button {
+  border: 1px solid rgba(251, 113, 133, 0.34);
+  background: rgba(251, 113, 133, 0.09);
+  color: #fecdd3;
+}
+
+.ghost-button {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted-strong);
+}
+
+.form-error,
+.inline-error {
+  border: 1px solid rgba(251, 113, 133, 0.24);
+  border-radius: var(--radius);
+  background: rgba(251, 113, 133, 0.08);
+  color: #fecdd3;
+  padding: 10px 12px;
+  font-size: 14px;
+}

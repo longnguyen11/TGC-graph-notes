@@ -1,0 +1,31 @@
+@media (max-width: 760px) {
+  .site-nav {
+    align-items: flex-start;
+    padding: 14px 0;
+    flex-direction: column;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-header {
+    flex-direction: column;
+  }
+
+  .metric-row {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-canvas {
+    min-height: 380px;
+  }
+}
