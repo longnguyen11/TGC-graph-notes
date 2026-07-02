@@ -54,15 +54,10 @@
 }
 
 .note-body {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
   margin: 0;
   color: var(--muted-strong);
   line-height: 1.65;
   overflow-wrap: anywhere;
-  text-overflow: ellipsis;
   white-space: pre-wrap;
 }
 
