@@ -17,8 +17,8 @@ export default function Home() {
           <div>
             <h2>FPS over time</h2>
             <p>
-              A polished chart view with per-user lines, hover detail, and time
-              range controls.
+              A chart view with per-user lines, hover detail, line style modes,
+              and time range controls.
             </p>
           </div>
           <div className="card-meta">

@@ -17,6 +17,7 @@ import {
 } from "@/lib/graph";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
+type LineMode = "linear" | "stepped";
 
 const testData: FeedEvent[] = [
   {
@@ -115,10 +116,35 @@ const testData: FeedEvent[] = [
     event: "ping",
     description: "",
   },
+  {
+    id: 12,
+    user: "Puekam",
+    fps: 44,
+    timestamp: 1652827060,
+    event: "enter_level",
+    description: "Level_Archives",
+  },
+  {
+    id: 13,
+    user: "Puekam",
+    fps: 47,
+    timestamp: 1652827425,
+    event: "add_party",
+    description: "david",
+  },
+  {
+    id: 14,
+    user: "Puekam",
+    fps: 42,
+    timestamp: 1652827500,
+    event: "ping",
+    description: "",
+  },
 ];
 
 export default function Graph() {
   const [selectedUsers, setSelectedUsers] = useState<Record<string, boolean>>({});
+  const [lineMode, setLineMode] = useState<LineMode>("linear");
 
   const series = useMemo(() => buildFpsSeries(testData), []);
   const userSummaries = useMemo(() => buildUserSummaries(testData), []);
@@ -219,7 +245,7 @@ export default function Graph() {
         id: item.user,
         name: item.user,
         data: item.points,
-        step: "end",
+        step: lineMode === "stepped" ? "end" : false,
         symbol: "circle",
         symbolSize: 7,
         showSymbol: true,
@@ -238,7 +264,7 @@ export default function Graph() {
         },
       })),
     }),
-    [selectedUsers, series],
+    [lineMode, selectedUsers, series],
   );
 
   function toggleUser(user: string) {
@@ -294,13 +320,32 @@ export default function Graph() {
               {formatTimestamp(firstTimestamp)} to {formatTimestamp(lastTimestamp)}
             </p>
           </div>
-          <div className="nav-links" aria-label="Legend actions">
-            <button className="ghost-button" type="button" onClick={showAllUsers}>
-              All
-            </button>
-            <button className="ghost-button" type="button" onClick={invertUsers}>
-              Invert
-            </button>
+          <div className="chart-actions">
+            <div className="segmented-control" aria-label="Line style">
+              <button
+                aria-pressed={lineMode === "linear"}
+                type="button"
+                onClick={() => setLineMode("linear")}
+              >
+                Linear
+              </button>
+              <button
+                aria-pressed={lineMode === "stepped"}
+                type="button"
+                onClick={() => setLineMode("stepped")}
+              >
+                Stepped
+              </button>
+            </div>
+
+            <div className="nav-links" aria-label="Legend actions">
+              <button className="ghost-button" type="button" onClick={showAllUsers}>
+                All
+              </button>
+              <button className="ghost-button" type="button" onClick={invertUsers}>
+                Invert
+              </button>
+            </div>
           </div>
         </div>
 

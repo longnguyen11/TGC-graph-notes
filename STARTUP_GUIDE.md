@@ -64,7 +64,7 @@ npm run build
 ## Deployment
 Deploy with Vercel and set both `DATABASE_URL` and `DIRECT_URL` in the project
 environment variables. Use the same Prisma Postgres standard `postgres://...`
-connection string unless you have separate pooled and direct URLs.
+connection string.
 
 Before release, apply migrations against the deployed database:
 

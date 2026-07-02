@@ -36,15 +36,28 @@ const events: FeedEvent[] = [
     event: "item_purchase",
     description: "season_pass",
   },
+  {
+    id: 4,
+    user: "Puekam",
+    fps: 44,
+    timestamp: 20,
+    event: "enter_level",
+    description: "Level_Rain",
+  },
 ];
 
 describe("buildFpsSeries", () => {
   it("groups events by user and sorts each user's points by timestamp", () => {
     const series = buildFpsSeries(events);
 
-    expect(series.map((item) => item.user)).toEqual(["david", "James"]);
+    expect(series.map((item) => item.user)).toEqual([
+      "david",
+      "James",
+      "Puekam",
+    ]);
     expect(series[0].points.map((point) => point.event.id)).toEqual([3, 1]);
     expect(series[1].points.map((point) => point.event.id)).toEqual([2]);
+    expect(series[2].points.map((point) => point.event.id)).toEqual([4]);
   });
 
   it("converts timestamp seconds to chart millisecond values", () => {
@@ -57,7 +70,7 @@ describe("buildFpsSeries", () => {
 
 describe("getAverageFps", () => {
   it("returns a rounded average fps", () => {
-    expect(getAverageFps(events)).toBe(38.7);
+    expect(getAverageFps(events)).toBe(40);
   });
 
   it("returns zero for an empty event set", () => {
@@ -88,6 +101,15 @@ describe("buildUserSummaries", () => {
         maxFps: 60,
         latestEvent: events[1],
       },
+      {
+        user: "Puekam",
+        color: "#f08a70",
+        eventCount: 1,
+        averageFps: 44,
+        minFps: 44,
+        maxFps: 44,
+        latestEvent: events[3],
+      },
     ]);
   });
 
@@ -98,14 +120,14 @@ describe("buildUserSummaries", () => {
 
 describe("getRecentEvents", () => {
   it("returns the newest events first up to the requested limit", () => {
-    expect(getRecentEvents(events, 2).map((event) => event.id)).toEqual([1, 2]);
+    expect(getRecentEvents(events, 2).map((event) => event.id)).toEqual([1, 4]);
   });
 
   it("uses id as a stable tie-breaker for matching timestamps", () => {
     const tiedEvents = [
       ...events,
       {
-        id: 4,
+        id: 5,
         user: "James",
         fps: 59,
         timestamp: 30,
@@ -115,7 +137,7 @@ describe("getRecentEvents", () => {
     ];
 
     expect(getRecentEvents(tiedEvents, 2).map((event) => event.id)).toEqual([
-      4, 1,
+      5, 1,
     ]);
   });
 });
