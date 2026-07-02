@@ -8,9 +8,12 @@
 .feed {
   display: grid;
   gap: 14px;
+  min-width: 0;
 }
 
 .note-card {
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.035);
@@ -37,10 +40,16 @@
 }
 
 .note-body {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
   margin: 0;
-  white-space: pre-wrap;
   color: var(--muted-strong);
   line-height: 1.65;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: pre-wrap;
 }
 
 .empty-state,
