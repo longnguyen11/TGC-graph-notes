@@ -42,7 +42,7 @@ describe("noteSchema", () => {
     if (!result.success) {
       expect(result.error.issues.map((issue) => issue.message)).toEqual([
         "Author must be 80 characters or fewer.",
-        "Body must be 1,000 characters or fewer.",
+        "Body must be 256 characters or fewer.",
       ]);
     }
   });

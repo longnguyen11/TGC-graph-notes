@@ -28,9 +28,23 @@
   margin-bottom: 12px;
 }
 
+.note-card header > div {
+  min-width: 0;
+}
+
+.note-card .danger-button {
+  flex-shrink: 0;
+}
+
 .note-author {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   margin: 0;
   font-weight: 750;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
 }
 
 .note-date {

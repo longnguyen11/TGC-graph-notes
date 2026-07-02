@@ -2,7 +2,7 @@ import { z, ZodError } from "zod";
 
 export const NOTE_LIMITS = {
   author: 80,
-  body: 1_000,
+  body: 256,
 } as const;
 
 export const noteSchema = z.object({
@@ -15,7 +15,7 @@ export const noteSchema = z.object({
     .string()
     .trim()
     .min(1, "Body is required.")
-    .max(NOTE_LIMITS.body, "Body must be 1,000 characters or fewer."),
+    .max(NOTE_LIMITS.body, "Body must be 256 characters or fewer."),
 });
 
 export type NoteInput = z.infer<typeof noteSchema>;

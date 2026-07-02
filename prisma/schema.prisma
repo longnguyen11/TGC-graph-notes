@@ -9,7 +9,7 @@ datasource db {
 model Note {
   id        Int      @id @default(autoincrement())
   author    String   @db.VarChar(80)
-  body      String   @db.VarChar(1000)
+  body      String   @db.VarChar(256)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
