@@ -24,7 +24,7 @@ export default function Home() {
           <div className="card-meta">
             <span>Open graph</span>
             <span className="arrow" aria-hidden="true">
-              -&gt;
+              &gt;
             </span>
           </div>
         </Link>
@@ -39,7 +39,7 @@ export default function Home() {
           <div className="card-meta">
             <span>Open notes</span>
             <span className="arrow" aria-hidden="true">
-              -&gt;
+              &gt;
             </span>
           </div>
         </Link>

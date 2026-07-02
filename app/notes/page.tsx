@@ -58,14 +58,19 @@ export default function Notes() {
     mutate: refreshNotes,
   } = useSWR<NotesResponse>("/api/notes", fetcher);
 
+  const isInitialFeedLoading = !data && !error;
   const notes = data?.notes ?? [];
   const noteCountLabel = useMemo(() => {
+    if (isInitialFeedLoading) {
+      return "Loading...";
+    }
+
     if (notes.length === 1) {
       return "1 post";
     }
 
     return `${notes.length} posts`;
-  }, [notes.length]);
+  }, [isInitialFeedLoading, notes.length]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -244,7 +249,9 @@ export default function Notes() {
             <span>{noteCountLabel}</span>
           </div>
 
-          {isLoading ? <div className="loading-state">Loading feed...</div> : null}
+          {isInitialFeedLoading || isLoading ? (
+            <div className="loading-state">Loading feed...</div>
+          ) : null}
 
           {error ? (
             <div className="inline-error">
@@ -252,7 +259,7 @@ export default function Notes() {
             </div>
           ) : null}
 
-          {!isLoading && !error && notes.length === 0 ? (
+          {!isInitialFeedLoading && !isLoading && !error && notes.length === 0 ? (
             <div className="empty-state">No posts yet.</div>
           ) : null}
 
